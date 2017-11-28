@@ -80,9 +80,6 @@ app.delete('/api/player/:playerId', (req, res) => {
 
 })
 
-app.listen(port, () => {
-	console.log(`API RESTful listeing at http://localhost:${port}`)
-})
 
 app.get('/api/club', (req, res) => {
 	con.query("SELECT * FROM Club", function (err, result, fields) {
@@ -99,4 +96,14 @@ app.get('/api/club', (req, res) => {
 		}
 		res.status(200).send({players})
 	})
+})
+
+mongoose.connect('mongodb://localhost:27017/futbol6',{ useMongoClient: true }, (err, res) => {
+
+	if (err) throw err
+	console.log('MongoDB connection succesfully stablished...')
+	app.listen(port, () => {
+		console.log(`API RESTful listeing at http://localhost:${port}`)
+	})
+
 })

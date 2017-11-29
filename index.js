@@ -5,6 +5,9 @@ const bodyParser = require('body-parser')
 const mysql = require('mysql')
 const mongoose = require('mongoose')
 
+// Line below is not a npm library so it is needed to declare full path
+const Player = require('./models/player')
+
 var con = mysql.createConnection({
 	host: "localhost",
 	user: "root",
@@ -19,7 +22,6 @@ con.connect(function(err){
 
 const app = express()
 const port = process.env.PORT || 3001
-
 
 /* middleware */
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -48,7 +50,6 @@ app.get('/api/player', (req, res) => {
 	})
 })
 
-
 app.get('/api/player/:playerId', (req, res) => {
 	con.query(`SELECT * FROM Jugador where id=${req.params.playerId}`, function (err, result, fields) {
   		if (err) throw err;
@@ -66,10 +67,25 @@ app.get('/api/player/:playerId', (req, res) => {
 	})
 })
 
-app.post('/api/player', (req, res) => {
+//this POST construction add a player to mongoDB
+app.post('/api/mongodb/player', (req, res) => {
+	console.log('POST /api/player')
 	/* thanks to body parser, we can access POST request body with req.body */
 	console.log(req.body)
-	res.status(200).send({message : 'Player received'})
+
+	let player = new Player()
+	player.id = req.body.id
+	player.fullName = req.body.fullName
+	player.nickName = req.body.nickName
+	player.profile = req.body.profile
+	player.affiliatedClub = req.body.affiliatedClub
+	player.condition = req.body.condition
+
+	player.save((err, playerStored) => {
+		if (err) res.status(500).send({message: `Error while inserting register into MongoDB. ${err}`})
+		res.status(200).send({player: playerStored})
+	})
+
 })
 
 app.put('/api/player/:playerId', (req, res) => {
@@ -79,7 +95,6 @@ app.put('/api/player/:playerId', (req, res) => {
 app.delete('/api/player/:playerId', (req, res) => {
 
 })
-
 
 app.get('/api/club', (req, res) => {
 	con.query("SELECT * FROM Club", function (err, result, fields) {
@@ -98,12 +113,21 @@ app.get('/api/club', (req, res) => {
 	})
 })
 
-mongoose.connect('mongodb://localhost:27017/futbol6',{ useMongoClient: true }, (err, res) => {
 
-	if (err) throw err
+//This is needed to avoid deprecation warnings related to promises:
+/*
+DeprecationWarning: Mongoose: mpromise (mongoose's default promise library) is deprecated, plug in your own promise library instead: http://mongoosejs.com/docs/promises.html
+*/
+mongoose.Promise = global.Promise;
+
+
+//The mongoDB connection
+mongoose.connect('mongodb://localhost:27017/futbol6',{ useMongoClient: true }, (err, res) => {
+	if (err) {
+		return console.log(`Error while trying to connect MongoDB. ${err}`)
+	}
 	console.log('MongoDB connection succesfully stablished...')
 	app.listen(port, () => {
 		console.log(`API RESTful listeing at http://localhost:${port}`)
 	})
-
 })

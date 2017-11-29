@@ -67,7 +67,7 @@ app.get('/api/player/:playerId', (req, res) => {
 	})
 })
 
-//this POST construction add a player to mongoDB
+//POST request to add a player to mongoDB
 app.post('/api/mongodb/player', (req, res) => {
 	console.log('POST /api/player')
 	/* thanks to body parser, we can access POST request body with req.body */

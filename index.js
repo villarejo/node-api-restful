@@ -85,16 +85,16 @@ app.get('/api/club', (req, res) => {
 	con.query("SELECT * FROM Club", function (err, result, fields) {
   		if (err) throw err;
   		//console.log(result);
-		var players = [];
+		var clubs = [];
 		for (var i = 0;i < result.length; i++) {
-			players.push(
+			clubs.push(
 				{
 					id : result[i].id,
 					fullName: result[i].nombre
 				}
 			)
 		}
-		res.status(200).send({players})
+		res.status(200).send({clubs})
 	})
 })
 

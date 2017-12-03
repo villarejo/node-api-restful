@@ -33,7 +33,7 @@ app.get('/hello/:name', (req, res) => {
 })
 */
 
-
+//Beware initial "/" is always needed!!
 app.get('/api/mongodb/player', (req, res) => {
 
 	Player.find({} , (err, players) => {
@@ -80,14 +80,38 @@ app.post('/api/mongodb/player', (req, res) => {
 
 })
 
-app.put('/api/mongodb/player/:playerId', (req, res) => {
 
+//Put method recomended for updates
+app.put('/api/mongodb/player/:playerId', (req, res) => {
+	let playerId = req.params.playerId
+	let update = req.body
+
+	Player.findByIdAndUpdate(playerId, update, (err, playerUpdated) => {
+
+		if (err) return res.status(500).send({message: `Error when getting response. ${err}`})
+		if (!playerUpdated) return res.status(404).send({message: `Player does not exist`})
+
+		res.status(200).send({ message: `Player with id ${playerId} successfully updated` })
+	})
 })
 
 app.delete('/api/mongodb/player/:playerId', (req, res) => {
+	let playerId = req.params.playerId
 
+	Player.findById(playerId, (err, player) => {
+
+		if (err) return res.status(500).send({message: `Error when getting response. ${err}`})
+		if (!player) return res.status(404).send({message: `Player does not exist`})
+
+		player.remove(err =>{
+			if (err) return res.status(500).send({message: `Error when getting response. ${err}`})
+			res.status(200).send({ message: `Player with id ${playerId} was successfully removed` })
+		})
+	})
 })
 
+
+//MYSQL version (no express, need to be improved!)
 app.get('/api/mysql/player', (req, res) => {
 	con.query("SELECT * FROM Jugador", function (err, result, fields) {
   		if (err) throw err;

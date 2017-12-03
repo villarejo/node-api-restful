@@ -33,38 +33,30 @@ app.get('/hello/:name', (req, res) => {
 })
 */
 
-app.get('/api/player', (req, res) => {
-	con.query("SELECT * FROM Jugador", function (err, result, fields) {
-  		if (err) throw err;
-  		//console.log(result);
-		var players = [];
-		for (var i = 0;i < result.length; i++) {
-			players.push(
-				{
-					id : result[i].id,
-					fullName: result[i].nombre_apellidos
-				}
-			)
-		}
-		res.status(200).send({players})
+
+app.get('/api/mongodb/player', (req, res) => {
+
+	Player.find({} , (err, players) => {
+
+		if (err) return res.status(500).send({message: `Error when getting response. ${err}`})
+		if (!players) return res.status(404).send({message: `It does not exist any product`})
+		res.status(200).send({ players })
 	})
+
 })
 
-app.get('/api/player/:playerId', (req, res) => {
-	con.query(`SELECT * FROM Jugador where id=${req.params.playerId}`, function (err, result, fields) {
-  		if (err) throw err;
-  		console.log(result);
-		var players = [];
-		for (var i = 0;i < result.length; i++) {
-			players.push(
-				{
-					id : result[i].id,
-					fullName: result[i].nombre_apellidos
-				}
-			)
-		}
-		res.status(200).send({players})
+
+app.get('/api/mongodb/player/:playerId', (req, res) => {
+
+	let playerId = req.params.playerId
+
+	Player.findById(playerId, (err, player) => {
+		if (err) return res.status(500).send({message: `Error when getting response. ${err}`})
+		if (!player) return res.status(404).send({message: `Player does not exist`})
+
+		res.status(200).send({ player })
 	})
+
 })
 
 //POST request to add a player to mongoDB
@@ -88,15 +80,49 @@ app.post('/api/mongodb/player', (req, res) => {
 
 })
 
-app.put('/api/player/:playerId', (req, res) => {
+app.put('/api/mongodb/player/:playerId', (req, res) => {
 
 })
 
-app.delete('/api/player/:playerId', (req, res) => {
+app.delete('/api/mongodb/player/:playerId', (req, res) => {
 
 })
 
-app.get('/api/club', (req, res) => {
+app.get('/api/mysql/player', (req, res) => {
+	con.query("SELECT * FROM Jugador", function (err, result, fields) {
+  		if (err) throw err;
+  		//console.log(result);
+		var players = [];
+		for (var i = 0;i < result.length; i++) {
+			players.push(
+				{
+					id : result[i].id,
+					fullName: result[i].nombre_apellidos
+				}
+			)
+		}
+		res.status(200).send({players})
+	})
+})
+
+app.get('/api/mysql/player/:playerId', (req, res) => {
+	con.query(`SELECT * FROM Jugador where id=${req.params.playerId}`, function (err, result, fields) {
+  		if (err) throw err;
+  		console.log(result);
+		var players = [];
+		for (var i = 0;i < result.length; i++) {
+			players.push(
+				{
+					id : result[i].id,
+					fullName: result[i].nombre_apellidos
+				}
+			)
+		}
+		res.status(200).send({players})
+	})
+})
+
+app.get('/api/mysql/club', (req, res) => {
 	con.query("SELECT * FROM Club", function (err, result, fields) {
   		if (err) throw err;
   		//console.log(result);

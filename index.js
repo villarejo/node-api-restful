@@ -3,8 +3,7 @@
 const mysql = require('mysql')
 const mongoose = require('mongoose')
 const app = require('./app')
-const port = process.env.PORT || 3001
-
+const config = require('./config')
 //MYSQL version (no express, need to be improved!)
 app.get('/api/mysql/player', (req, res) => {
 	con.query("SELECT * FROM Jugador", function (err, result, fields) {
@@ -65,13 +64,13 @@ DeprecationWarning: Mongoose: mpromise (mongoose's default promise library) is d
 mongoose.Promise = global.Promise;
 
 //The mongoDB connection
-mongoose.connect('mongodb://localhost:27017/futbol6',{ useMongoClient: true }, (err, res) => {
+mongoose.connect(config.db,{ useMongoClient: true }, (err, res) => {
 	if (err) {
 		return console.log(`Error while trying to connect MongoDB. ${err}`)
 	}
 	console.log('MongoDB connection succesfully stablished...')
-	app.listen(port, () => {
-		console.log(`API RESTful listeing at http://localhost:${port}`)
+	app.listen(config.port, () => {
+		console.log(`API RESTful listeing at http://localhost:${config.port}`)
 	})
 })
 

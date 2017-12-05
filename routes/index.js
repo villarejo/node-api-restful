@@ -10,16 +10,18 @@ const api = express.Router()
 api.get('/mongodb/player', playerCtrl.getPlayers)
 api.get('/mongodb/player/:playerId', playerCtrl.getPlayer)
 //POST request to add a player to mongoDB
-api.post('/mongodb/player', playerCtrl.savePlayer)
+api.post('/mongodb/player', auth, playerCtrl.savePlayer)
 //Put method recomended for updates
-api.put('/mongodb/player/:playerId', playerCtrl.updatePlayer)
-api.delete('/mongodb/player/:playerId', playerCtrl.deletePlayer)
+api.put('/mongodb/player/:playerId', auth, playerCtrl.updatePlayer)
+api.delete('/mongodb/player/:playerId', auth, playerCtrl.deletePlayer)
 
 api.post('/signup', userCtrl.signUp)
 api.post('/signin', userCtrl.signIn)
 
+/** valid token check example
 api.get('/private', auth, (req, res) => {
 	res.status(200).send({ message: 'Access granted' })
 })
+*/
 
 module.exports = api

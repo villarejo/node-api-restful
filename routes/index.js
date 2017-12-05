@@ -18,10 +18,12 @@ api.delete('/mongodb/player/:playerId', auth, playerCtrl.deletePlayer)
 api.post('/signup', userCtrl.signUp)
 api.post('/signin', userCtrl.signIn)
 
-/** valid token check example
+api.get('/user', userCtrl.getUsers)
+api.delete('/user/:userId', auth, userCtrl.deleteUser)
+
+// valid token check example
 api.get('/private', auth, (req, res) => {
-	res.status(200).send({ message: 'Access granted' })
+	res.status(200).send({ message: `Access granted` })
 })
-*/
 
 module.exports = api

@@ -4,10 +4,10 @@ const services = require('../services')
 
 function isAuth (req, res, next) {
 	if(!req.headers.authorization) {
-		return res.status(403).send({ message: 'You are not authorised' })
+		return res.status(403).send({ message: 'You are not authorized' })
 	}
 
-	const token = req.headers.authorization.split(" ")[1]
+	const token = req.headers.authorization.split(' ')[1]
 
 	services.decodeToken(token)
 		.then(response => {
@@ -15,7 +15,7 @@ function isAuth (req, res, next) {
 			next()
 		})
 		.catch(response => {
-			res.status(response.status)
+			res.status(response.status).send({ message: response.message })
 		})
 }
 

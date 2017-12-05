@@ -17,7 +17,9 @@ function getPlayer (req, res) {
 function getPlayers (req, res) {
 	Player.find({} , (err, players) => {
 		if (err) return res.status(500).send({message: `Error when getting response. ${err}`})
-		if (!players) return res.status(404).send({message: `It does not exist any product`})
+
+		//Beware !players is not valid with find function because it returns an object with value []
+		if (!players.length) return res.status(404).send({message: `It does not exist any player`})
 
 		res.status(200).send({ players })
 	})

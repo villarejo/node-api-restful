@@ -12,21 +12,26 @@ function signUp (req, res) {
 	})
 
 	user.save((err) => {
-		if (err) res.status(500).send( message: `Error creating user: ${err}`)
+		if (err) res.status(500).send({ message: `Error creating user: ${err}` })
 
 		return res.status(201).send({ token: service.createToken(user) })
 	})
 }
 
 function signIn (req, res) {
-	User.find( { email: req.body.email}, (err, user) => {
+	User.find( { email: req.body.email }, (err, user) => {
+
 		if(err) return rest.status(500).send({ message: err })
-		if(!User) return res.status(404).send({ message: `User does not exist` })
+
+		//Beware !user is not valid with find function because it returns an object with value []
+		if (!user.length) return res.status(404).send({
+			message: `User does not exist ${user}`
+		})
 
 		req.user = user
 		res.status(200).send({
-			message: `Correct log in`,
-			token:
+			message: `Correct log in ${user}`,
+			token: service.createToken(user)
 		})
 	})
 }

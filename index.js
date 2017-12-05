@@ -1,12 +1,13 @@
 'use strict'
 
-const mysql = require('mysql')
 const mongoose = require('mongoose')
 const app = require('./app')
 const config = require('./config')
-//MYSQL version (no express, need to be improved!)
+const db = require('./db')
+
+//MYSQL version (no express, need to be improved (and modelled)!)
 app.get('/api/mysql/player', (req, res) => {
-	con.query("SELECT * FROM Jugador", function (err, result, fields) {
+	db.get().query("SELECT * FROM Jugador", function (err, result, fields) {
   		if (err) throw err;
   		//console.log(result);
 		var players = [];
@@ -23,7 +24,7 @@ app.get('/api/mysql/player', (req, res) => {
 })
 
 app.get('/api/mysql/player/:playerId', (req, res) => {
-	con.query(`SELECT * FROM Jugador where id=${req.params.playerId}`, function (err, result, fields) {
+	db.get().query(`SELECT * FROM Jugador where id=${req.params.playerId}`, function (err, result, fields) {
   		if (err) throw err;
   		console.log(result);
 		var players = [];
@@ -39,23 +40,6 @@ app.get('/api/mysql/player/:playerId', (req, res) => {
 	})
 })
 
-app.get('/api/mysql/club', (req, res) => {
-	con.query("SELECT * FROM Club", function (err, result, fields) {
-  		if (err) throw err;
-  		//console.log(result);
-		var clubs = [];
-		for (var i = 0;i < result.length; i++) {
-			clubs.push(
-				{
-					id : result[i].id,
-					fullName: result[i].nombre
-				}
-			)
-		}
-		res.status(200).send({clubs})
-	})
-})
-
 
 //This is needed to avoid deprecation warnings related to promises:
 /*
@@ -67,21 +51,20 @@ mongoose.Promise = global.Promise;
 mongoose.connect(config.db,{ useMongoClient: true }, (err, res) => {
 	if (err) {
 		return console.log(`Error while trying to connect MongoDB. ${err}`)
+		process.exit(1)
 	}
-	console.log('MongoDB connection succesfully stablished...')
+	console.log('MongoDB connection successfully stablished')
 	app.listen(config.port, () => {
 		console.log(`API RESTful listeing at http://localhost:${config.port}`)
 	})
 })
 
-var con = mysql.createConnection({
-	host: "localhost",
-	user: "root",
-	password: "ubuntu",
-	database: "futbol6"
-})
 
-con.connect(function(err){
-	if(err) throw err
-	console.log("Connected to MySQL")
+// Connect to MySQL on start
+db.connect(db.MODE_PRODUCTION, function(err) {
+	if (err) {
+		return console.log(`Unable to connect to MySQL. ${err}`)
+		process.exit(1)
+	}
+	console.log('MySQL connection successfully stablished')
 })
